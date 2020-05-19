@@ -71,8 +71,9 @@ recv_buf = p.recv(64).split()
 start = int(recv_buf[3], 16)
 end = int(recv_buf[-1], 16)
 ```
-We can now use this as a base to calculate other addresses from and defeat ASLR. The first buffer overflow consists of a 16 bytes padding to fill up the pointer on the stack, the next 16 bytes will become the new rbp. The new rbp should point to after the read call in main plus 0x10, because rax will point here after we subtract 0x10. Then the second read call will overwrite the code here with our shell code.
+We can now use this as a base to calculate other addresses from and defeat ASLR. The first buffer overflow consists of a 16 bytes padding to fill up the pointer on the stack, the next 8 bytes will become the new rbp. The new rbp should point to after the read call in main plus 0x10, because rax will point here after we subtract 0x10. Then the second read call will overwrite the code here with our shell code.
 ```
 
 ```
-and the second write call will place your shell code at the end of main.  Then we set rip to `start+0x12d6+0x10`, 0x12d6 being the offset from the start of the code segment to `<main+27>`.
+Now the second write call will place your shell code at the end of main.
+Then we set rip to `start+0x12d6+0x10`, 0x12d6 being the offset from the start of the code segment to `<main+27>`.
