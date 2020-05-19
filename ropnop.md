@@ -58,6 +58,21 @@ The buffer overflow allows control over rip, rbp and the stack. If the stack wou
 <+47>:	call  0x555555555040 <read@plt>
 ```
 The rax register is the address we will write to and if we can control it we can overwrite code. As you can see at `<+27>` rax becomes rbp-0x10 and we already control rbp.
-We can use your second buffer overflow to overwrite the last instructions of main with shell code. After we return from read into main our shell code will be executed.
+We can use your second buffer overflow that we get because we jump here to overwrite the last instructions of main with shell code. After we return from read back into main our shell code that sits at the end of main will be executed.
 ## The exploit
-To automate the process of sending and receiving data we can use the python library [pwn-tools](http://docs.pwntools.com/en/stable/). We get the process and store in the variable p. We read the output from the printf in ropnop and extract the start address from the string. We can now use this as a base to calculate other addresses from and defeat ASLR. The first buffer overflow consists of a 16 bytes padding to fill up the pointer on the stack, the next 16 bytes will become the new rbp. The new rbp should point to after the read call in main plus 0x10, because rax will point here after we subtract 0x10 and the second write call will place your shell code at the end of main.  Then we set rip to `start+0x12d6+0x10`, 0x12d6 being the offset from the start of the code segment to `<main+27>`.
+To automate the process of sending and receiving data we can use the python library [pwn-tools](http://docs.pwntools.com/en/stable/). We get the process and store it in the variable p.
+```
+p = remote("hax1.allesctf.net", 9300)
+```
+We read the output from the printf in ropnop and extract the start address from the string.
+```
+recv_buf = p.recv(64).split()
+
+start = int(recv_buf[3], 16)
+end = int(recv_buf[-1], 16)
+```
+We can now use this as a base to calculate other addresses from and defeat ASLR. The first buffer overflow consists of a 16 bytes padding to fill up the pointer on the stack, the next 16 bytes will become the new rbp. The new rbp should point to after the read call in main plus 0x10, because rax will point here after we subtract 0x10. Then the second read call will overwrite the code here with our shell code.
+```
+
+```
+and the second write call will place your shell code at the end of main.  Then we set rip to `start+0x12d6+0x10`, 0x12d6 being the offset from the start of the code segment to `<main+27>`.
