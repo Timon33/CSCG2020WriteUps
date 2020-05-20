@@ -107,5 +107,88 @@ Pushes the last stack value on the stack again.
 Exit the program.
 
 ## Extracting the flag
+Now that we know what each opcode does, we can write a python script to turn the emojis to assembly like opcodes. The Python script EmojiDecoder.py takes the code.bin and writes a file like:
 
+````
+0000 - PUSH	 0090
+002E - PUSH	 0017
+005C - WRITE
+0062 - PUSH	 00A7
+0090 - PUSH	 0014
+00BE - WRITE
+00C4 - PUSH	 0000
+00F2 - PUSH	 001B
+0120 - READ
+0124 - PUSH	 0000
+0152 - PUSH	 00F2
+0180 - LD08	 0000	(0000)
+01AE - XOR
+01B2 - PUSH	 009C
+01E0 - XOR
+01E4 - OR
+01E7 - PUSH	 00EA
+0215 - LD08	 0001	(0000)
+0243 - XOR
+0247 - PUSH	 00D9
+0275 - XOR
+0279 - OR
+````
 
+(500+ lines total)
+
+Now we can analyse this. The fist to wirtes print `Welcome to eVMoji 😎` and `🤝 me the 🏳️`. Then we read 0x1b characters, so we now the flag is 27 letters long.
+
+### First part
+After that we have the first part of the encoding. First 0 is pushed then we always follow a patter like:
+````
+PUSH	 val1
+LD08	 offset
+XOR
+PUSH	 val2
+XOR
+OR
+````
+At the end we check if the stack value is zero. To achive this our result has to be zero befor the or, and for this to be the case `val2` has to be the same as the xor result of `val1` and `LD08 offset` where offset is always the next byte from our input. Overall this means the input at offset has to `val1 ^ val2`. This happens 23 times so for the first 23 character in the input. Again we can use a python script that xors these values for us and prints them. If we do that we get `n3w_ag3_v1rtu4liz4t1on_`. But here is a part missing, the 4 character to get 27 total...
+
+### Second part
+The last for character are checkt in the scound part of the program. You probably can bruteforce them by throwing all possible inputs against the program, but my aproch was to find the algorithm (wich is quite simple to implement in c) and then write a program that performs it quickly. If you can figure out how to revers it that would be even better, but i didn't and the bruteforce only take a few secounds using that approach.
+
+I will not go in such depht this time but the patter is similar. We have a few instruction that are repeated multiple times and then are jump to check if the end result ist correct. If we extract all constants from the code.bin file (and watch out for endianness wich threw me off first) we find the algorithm can be implemented in c like this:
+
+````
+void algorithm(unsigned int input)
+{	
+	unsigned int prev = 0xffffffff;
+	unsigned int temp = 0;
+
+	for(int i = 0; i < 32; i++)
+	{
+		bool x = ((input >> i) & 1) == (prev & 1);
+
+		prev = prev >> 1;
+
+		if(!x)
+		{
+			prev = prev ^ 0xedb88320;
+		}
+	}
+
+	if(prev == 0xf40e845e)
+	{
+		printf("result: %x\n", input);
+	}
+}
+````
+
+The function takes an int wich is made up of the last 4 bytes of the flag and prints if it is a possible solution for the password check. We build and int from all combination of all charakter that could be in the flag and call the function. If we compile bruteforce.c with gcc and the -O3 option for execution speed and run the binary we get the reuslt `3f6c306c` almost instantly. If we convert it back to ASCII and append it to the knowen part of the flag we get `n3w_ag3_v1rtu4liz4t1on_l0l?`.
+
+## Result
+If we run the program with the password we get:
+````
+timo@ubuntu:~/CSCG/eVMoji$ ./eVMoji code.bin 
+Welcome to eVMoji 😎
+🤝 me the 🏳️
+n3w_ag3_v1rtu4liz4t1on_l0l?
+Thats the flag: CSCG{n3w_ag3_v1rtu4liz4t1on_l0l?}
+````
+Thats it, submit it and get the points. 😎😎😎
