@@ -59,17 +59,53 @@ where `numbersFromEmojies` is an int array that contains the numbers that the em
 
 #### Write✏️
 This opcode writes a string to stdout. Count of bytes to wite is poped from the stack, then a offset to the string to print is poped. The offset points to the segment that contains the start of the file and the strings like `🤝 me the 🏳️`. The opcode is used to print these messages to the user.
-`n = pop()`
-`offste = pop()`
-`write(stdout, dataSegmentBase + offset, n)`
+````
+n = pop()
+offste = pop()
+write(stdout, dataSegmentBase + offset, n)
+````
 
 #### Read📖
 This opcode works like write except it reads a number of bytes from stdin and stores them on the same segment the static strings are stored.
-`n = pop()`
-`offste = pop()`
-`read(stdin, dataSegmentBase + offset, n)`
-
+````
+n = pop()
+offste = pop()
+read(stdin, dataSegmentBase + offset, n)
+````
 
 #### Push💪
 This opcode pushes the opcode argument that is computed as descripted above onto the stack.
+
+#### Load🦾
+Similar to push, but the argument is interpreted as an offset from segment the write and read use. This opcode is used to load the bytes stored by read and push them to the stack.
+
+#### Xor🔀
+Pops 2 values and pushes the xor reusult of them:
+`push(pop() ^ pop())`
+
+#### Or✅
+Pops 2 values and ors them pushes the reuslt:
+`push(pop() | pop())`
+
+#### Jump🤔
+Pops 2 values and compares them, if they are equal jump to the offset in the emoji code given by the argument.
+
+#### Load32🌠
+Same as Load but loads 32 bit instead of 8 from the read/write segment. Used to load some constants for the decrypting alogorithm that are stored in binary at the start of the code.bin file.
+
+#### And1➕
+Pops a value, ands it with 1 and pushes it back (turining it to a bool value).
+
+#### Shift➡️
+Shifts the last stack value as many bits as spezifed in the argument bitwise to the right.
+
+#### Copy‼️
+Pushes the last stack value on the stack again.
+`push(peek())`
+
+#### Exit💀
+Exit the program.
+
+## Extracting the flag
+
 
