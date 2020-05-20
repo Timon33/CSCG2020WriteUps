@@ -26,7 +26,7 @@ Using the file command we can also find that the binary is stripped so reversing
 As a debuger/decomplier i again used ghidra because it is free and has some nice decompilation
 
 **This challange took we quite a while to reverse and its not that simple. Thats why i will not explain how i discoverd every litter thing
-, but descibe what every function does with the knowlege of how the hole challange work in mind**
+, but descibe what every function does with the knowlege of how the hole challange work in mind.**
 
 ### Setup
 We can find the main function using the entry function and rename it. Main opens the code.bin file wich is supplied in the second argument.
