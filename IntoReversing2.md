@@ -78,7 +78,7 @@ We can use a very simple python script to decode the password and print it. We s
 number in it. Then we and it with 0xff so it say in the range of a byte. We can print the result as a bytearray and get `sta71c_tr4n5f0rm4710n_it_isw`
 (You can find the full script at additional files). 
 
-We connect to the server and sumit the password with `nc hax1.allesctf.net 9602`. The Server gives us the flag `CSCG{1s_th4t_wh4t_they_c4ll_on3way_transf0rmati0n?}`.
+We connect to the server and sumit the password with `nc hax1.allesctf.net 9601`. The Server gives us the flag `CSCG{1s_th4t_wh4t_they_c4ll_on3way_transf0rmati0n?}`.
 
 ## Preventing the attack
 On way to make this application more secure, is to not store the password in plain text, but as a hash. Then the user supplied password is hashed using the same algorithm and they both are compared.
