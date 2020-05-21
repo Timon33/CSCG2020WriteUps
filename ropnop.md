@@ -57,7 +57,8 @@ The buffer overflow allows control over rip, rbp and the stack. If the stack wou
 <+42>:	mov   edx,0x1337
 <+47>:	call  0x555555555040 <read@plt>
 ```
-The rax register is the address we will write to and if we can control it we can overwrite code. As you can see at `<+27>` rax becomes rbp-0x10 and we already control rbp.
+The rax register is the address we will write to and if we can control it we can overwrite code. As you can see at `<+27>` rax is loaded from rbp-0x10 and we already control rbp.
+
 We can use your second buffer overflow that we get because we jump here to overwrite the last instructions of main with shell code. After we return from read back into main our shell code that sits at the end of main will be executed.
 ## The exploit
 To automate the process of sending and receiving data we can use the python library [pwn-tools](http://docs.pwntools.com/en/stable/). We get the process and store it in the variable p.
