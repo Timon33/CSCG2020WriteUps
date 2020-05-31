@@ -66,4 +66,4 @@ public static string Decrypt(string cipherText)
 			return cipherText;
 		}
 ````
-As we can see
+As we can see we are delaing with AES. We can copy the function and the call to it and print the result. We execute it and get the output CanIHazFlag?. So your first flag is CSCG{CanIHazFlag?}.
