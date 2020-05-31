@@ -54,4 +54,4 @@ p we have the first factor. To get the secound we take the result of that divisi
 d and decrypt the message. To get the large number that is the reuslt of the decryption into a readable format we use the `long_to_bytes` function from the
 `Crypto.Util.number` module.
 
-Running the python script
+Running the python script found in additional files we quicky find the small factor `p = 622751` and get the flag `CSCG{factorizing_the_key=pr0f1t}` after decrypting the message.
