@@ -40,5 +40,5 @@ It used the property that you can write the difference of 2 squares as 2 factors
 ````
 x^2 - y^2 = (x - y) * (x + y)
 ````
-So if we can express N as the diffrence of 2 squares we can find the prime factors. We use python to test values for y^2 until y is a an integer.
+So if we can express N as the diffrence of 2 squares we can find the prime factors. We use python to test values for `y^2` until `y` is a an integer.
 Then we can calculate q and p and thereby d. If we decrypt the message and turn it into text we get `CSCG{Ok,_next_time_I_choose_p_and_q_random...}`.
