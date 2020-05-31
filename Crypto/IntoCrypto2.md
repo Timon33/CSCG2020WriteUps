@@ -34,7 +34,7 @@ So is the Modulus used secure? Obviously not but this time we need to use a bit 
 If we search for attacks on RSA we can learn about the `Fermat factoring algorithm`. It can quickly factor a product of 2 primes, even if they
 are large, as long as they are about the same size.
 
-You can find a detalied explonation of the methode (here)[https://www.nku.edu/~christensen/Mathematical%20attack%20on%20RSA.pdf] under `Fermat factoring algorithm`.
+You can find a detalied explonation of the methode [here](https://www.nku.edu/~christensen/Mathematical%20attack%20on%20RSA.pdf) under `Fermat factoring algorithm`.
 It used the property that you can write the difference of 2 squares as 2 factors.
 
 ````
