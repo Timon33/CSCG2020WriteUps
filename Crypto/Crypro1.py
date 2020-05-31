@@ -24,14 +24,6 @@ MAX = 10**7
 
 print("N is: " + str(N))
 
-'''
-n = n.split(":")
-n.reverse()
-
-for i,b in enumerate(n):
-    N += int(b, 16) * (0x100 ** i)
-'''
-
 for i in range(2, MAX):
     if N % i == 0:
         print("p is:" + str(i))
