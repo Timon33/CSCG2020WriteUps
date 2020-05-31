@@ -8,7 +8,7 @@ A idea would be to compute the gcd of the diffrent moduli and if they are greate
 no gcd > 1.
 
 However if we use openssl to look at the numbers of the public keys we will notice they all use the public exponent e = 3. We also know that
-they probaly all contain the same plain text message. This allows attack as descript (here)[https://www.johndcook.com/blog/2019/03/06/rsa-exponent-3/].
+they probaly all contain the same plain text message. This allows attack as descript [here](https://www.johndcook.com/blog/2019/03/06/rsa-exponent-3/).
 
 If we solve the system
 ````
